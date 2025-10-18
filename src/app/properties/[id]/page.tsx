@@ -79,6 +79,14 @@ export default function PropertyDetailsPage() {
 
   if (!property) return null;
 
+  // Use consistent stat objects with optional unit property
+  const stats = [
+    { label: 'Bedrooms', value: property.bedrooms, short: 'Beds', unit: '' },
+    { label: 'Bathrooms', value: property.bathrooms, short: 'Baths', unit: '' },
+    { label: 'Area', value: property.area, short: 'Sqft. Area'},
+    { label: 'Deposit', value: `₹${(property.deposit / 1000).toFixed(0)}`, short: 'Deposit' },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 pb-20 lg:pb-0">
       {/* Mobile-Friendly Header */}
@@ -101,6 +109,7 @@ export default function PropertyDetailsPage() {
           </div>
         </div>
       </div>
+
 
       {/* Mobile-Optimized Image Gallery */}
       <div className="bg-gray-900">
@@ -138,6 +147,7 @@ export default function PropertyDetailsPage() {
               </>
             )}
 
+
             <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 flex items-end justify-between z-10">
               <div className="flex gap-1.5 sm:gap-2">
                 <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-orange-500 text-white text-[10px] sm:text-xs font-bold rounded-full shadow-lg">
@@ -161,6 +171,7 @@ export default function PropertyDetailsPage() {
                 </div>
               </div>
             </div>
+
 
             {/* Thumbnail Navigation - Hidden on Mobile */}
             <div className="absolute bottom-14 left-1/2 -translate-x-1/2 hidden lg:flex gap-2 z-10">
@@ -210,15 +221,10 @@ export default function PropertyDetailsPage() {
           </div>
 
           <div className="grid grid-cols-4 gap-1.5 sm:gap-2 md:gap-3">
-            {[
-              { label: 'Bedrooms', value: property.bedrooms, short: 'Beds' },
-              { label: 'Bathrooms', value: property.bathrooms, short: 'Baths' },
-              { label: 'Area', value: property.area, short: ' sqft. Area' },
-              { label: 'Deposit', value: `₹${(property.deposit / 1000).toFixed(0)}`, short: 'Deposit' },
-            ].map((stat, idx) => (
+            {stats.map((stat, idx) => (
               <div key={idx} className="p-2 sm:p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl text-center">
                 <div className="text-base sm:text-lg md:text-xl font-black text-gray-900">
-{stat.value}{'unit' in stat ? stat.unit : ''}
+                  {String(stat.value)}{('unit' in stat && stat.unit) ? String(stat.unit) : ''}
                 </div>
                 <div className="text-[9px] sm:text-[10px] md:text-xs text-gray-600 font-semibold mt-0.5">
                   {stat.short}
@@ -227,7 +233,6 @@ export default function PropertyDetailsPage() {
             ))}
           </div>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-5">
