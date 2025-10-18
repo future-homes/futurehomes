@@ -218,7 +218,7 @@ export default function PropertyDetailsPage() {
             ].map((stat, idx) => (
               <div key={idx} className="p-2 sm:p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl text-center">
                 <div className="text-base sm:text-lg md:text-xl font-black text-gray-900">
-                  {stat.value}{stat.unit || ''}
+{stat.value}{'unit' in stat ? stat.unit : ''}
                 </div>
                 <div className="text-[9px] sm:text-[10px] md:text-xs text-gray-600 font-semibold mt-0.5">
                   {stat.short}
