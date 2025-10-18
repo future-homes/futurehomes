@@ -16,6 +16,8 @@ export default function AdminPanelPage() {
   const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending');
   const [rejectionReason, setRejectionReason] = useState<{ [key: string]: string }>({});
   const [showRejectModal, setShowRejectModal] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
@@ -68,6 +70,20 @@ export default function AdminPanelPage() {
       fetchProperties();
     } catch (error: any) {
       alert(error.message || 'Failed to reject property');
+    }
+  };
+
+  const handleDelete = async (propertyId: string) => {
+    setDeleting(true);
+    try {
+      await propertyService.deleteProperty(propertyId);
+      alert('Property deleted permanently from database');
+      setShowDeleteModal(null);
+      fetchProperties();
+    } catch (error: any) {
+      alert(error.message || 'Failed to delete property');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -134,7 +150,7 @@ export default function AdminPanelPage() {
 
         {/* Tabs */}
         <div className="bg-white rounded-2xl shadow-lg mb-6">
-          <div className="flex border-b">
+          <div className="flex border-b overflow-x-auto">
             {[
               { key: 'pending', label: 'Pending', count: stats.pending },
               { key: 'approved', label: 'Approved', count: stats.approved },
@@ -144,7 +160,7 @@ export default function AdminPanelPage() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`flex-1 px-6 py-4 text-center font-semibold transition-colors ${
+                className={`flex-1 px-6 py-4 text-center font-semibold transition-colors whitespace-nowrap ${
                   activeTab === tab.key
                     ? 'text-blue-600 border-b-2 border-blue-600'
                     : 'text-gray-600 hover:text-gray-900'
@@ -180,7 +196,7 @@ export default function AdminPanelPage() {
                       fill
                       className="object-cover"
                     />
-                    <div className="absolute top-4 left-4 flex gap-2">
+                    <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
                       <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                         property.status === 'pending' ? 'bg-orange-500 text-white' :
                         property.status === 'approved' ? 'bg-green-500 text-white' :
@@ -222,14 +238,14 @@ export default function AdminPanelPage() {
                       {property.description}
                     </p>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-4 flex-wrap">
                       {property.bedrooms > 0 && <span>🛏️ {property.bedrooms} Beds</span>}
                       {property.bathrooms > 0 && <span>🚿 {property.bathrooms} Baths</span>}
                       <span>📏 {property.area} sq ft</span>
                       <span className="capitalize">🪑 {property.furnishing}</span>
                     </div>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-4 flex-wrap">
                       <span>👤 {property.contactDetails.name}</span>
                       <span>📞 {property.contactDetails.phone}</span>
                     </div>
@@ -243,17 +259,17 @@ export default function AdminPanelPage() {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 flex-wrap">
                       <Link
                         href={`/properties/${property.id}`}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold"
                       >
                         View Details
                       </Link>
 
                       <Link
                         href={`/properties/edit/${property.id}`}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm font-semibold"
                       >
                         Edit
                       </Link>
@@ -262,13 +278,13 @@ export default function AdminPanelPage() {
                         <>
                           <button
                             onClick={() => handleApprove(property.id)}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-semibold"
                           >
                             ✓ Approve
                           </button>
                           <button
                             onClick={() => setShowRejectModal(property.id)}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold"
                           >
                             ✗ Reject
                           </button>
@@ -278,7 +294,7 @@ export default function AdminPanelPage() {
                       {property.status === 'rejected' && (
                         <button
                           onClick={() => handleApprove(property.id)}
-                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-semibold"
                         >
                           Re-approve
                         </button>
@@ -287,11 +303,22 @@ export default function AdminPanelPage() {
                       {property.status === 'approved' && (
                         <button
                           onClick={() => setShowRejectModal(property.id)}
-                          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
+                          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm font-semibold"
                         >
                           Unpublish
                         </button>
                       )}
+
+                      {/* Delete Button - Always Available for Admin */}
+                      <button
+                        onClick={() => setShowDeleteModal(property.id)}
+                        className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition text-sm font-semibold flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -318,15 +345,57 @@ export default function AdminPanelPage() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowRejectModal(null)}
-                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleReject(showRejectModal)}
-                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold"
                 >
                   Reject Property
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Delete Property?</h3>
+                <p className="text-gray-600">
+                  This will <strong>permanently delete</strong> this property from the database. This action cannot be undone.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(null)}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(showDeleteModal)}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {deleting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Deleting...
+                    </>
+                  ) : (
+                    'Delete Forever'
+                  )}
                 </button>
               </div>
             </div>

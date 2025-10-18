@@ -426,8 +426,6 @@ export default function PropertyDetailsPage() {
                 <div className="font-bold text-gray-900 text-sm mb-3">
                   {new Date(property.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </div>
-                <div className="text-xs text-gray-600 mb-1">Property ID</div>
-                <div className="font-mono text-xs font-bold text-gray-900">#{property.id}</div>
               </div>
             </div>
           </div>

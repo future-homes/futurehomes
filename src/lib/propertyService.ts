@@ -53,7 +53,7 @@ const transformProperty = (data: any): Property => {
     approvedAt: data.approved_at,
     ownerId: data.owner_id,
     tenantType: data.tenant_type || undefined,
-    nearbyPlaces: data.nearby_places || undefined, // ADD THIS LINE
+    nearbyPlaces: data.nearby_places || undefined,
     contactDetails: {
       name: data.contact_name,
       phone: data.contact_phone,
@@ -184,6 +184,8 @@ export const propertyService = {
           featured: false,
           status: 'pending',
           owner_id: property.ownerId,
+          tenant_type: property.tenantType,
+          nearby_places: property.nearbyPlaces,
           contact_name: property.contactDetails.name,
           contact_phone: property.contactDetails.phone,
           contact_email: property.contactDetails.email,
@@ -198,34 +200,39 @@ export const propertyService = {
 
   // Update property (users can only update their own pending/rejected properties)
   async updateProperty(id: string, property: Partial<Property>) {
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
+      status: 'pending',
+    };
+
+    if (property.title !== undefined) updateData.title = property.title;
+    if (property.description !== undefined) updateData.description = property.description;
+    if (property.price !== undefined) updateData.price = property.price;
+    if (property.deposit !== undefined) updateData.deposit = property.deposit;
+    if (property.location?.address !== undefined) updateData.address = property.location.address;
+    if (property.location?.city !== undefined) updateData.city = property.location.city;
+    if (property.location?.state !== undefined) updateData.state = property.location.state;
+    if (property.location?.pincode !== undefined) updateData.pincode = property.location.pincode;
+    if (property.location?.coordinates?.lat !== undefined) updateData.latitude = property.location.coordinates.lat;
+    if (property.location?.coordinates?.lng !== undefined) updateData.longitude = property.location.coordinates.lng;
+    if (property.propertyType !== undefined) updateData.property_type = property.propertyType;
+    if (property.bedrooms !== undefined) updateData.bedrooms = property.bedrooms;
+    if (property.bathrooms !== undefined) updateData.bathrooms = property.bathrooms;
+    if (property.area !== undefined) updateData.area = property.area;
+    if (property.furnishing !== undefined) updateData.furnishing = property.furnishing;
+    if (property.amenities !== undefined) updateData.amenities = property.amenities;
+    if (property.images !== undefined) updateData.images = property.images;
+    if (property.availability !== undefined) updateData.availability = property.availability;
+    if (property.availableFrom !== undefined) updateData.available_from = property.availableFrom;
+    if (property.tenantType !== undefined) updateData.tenant_type = property.tenantType;
+    if (property.nearbyPlaces !== undefined) updateData.nearby_places = property.nearbyPlaces;
+    if (property.contactDetails?.name !== undefined) updateData.contact_name = property.contactDetails.name;
+    if (property.contactDetails?.phone !== undefined) updateData.contact_phone = property.contactDetails.phone;
+    if (property.contactDetails?.email !== undefined) updateData.contact_email = property.contactDetails.email;
+
     const { data, error } = await supabase
       .from('properties')
-      .update({
-        title: property.title,
-        description: property.description,
-        price: property.price,
-        deposit: property.deposit,
-        address: property.location?.address,
-        city: property.location?.city,
-        state: property.location?.state,
-        pincode: property.location?.pincode,
-        latitude: property.location?.coordinates?.lat,
-        longitude: property.location?.coordinates?.lng,
-        property_type: property.propertyType,
-        bedrooms: property.bedrooms,
-        bathrooms: property.bathrooms,
-        area: property.area,
-        furnishing: property.furnishing,
-        amenities: property.amenities,
-        images: property.images,
-        availability: property.availability,
-        available_from: property.availableFrom,
-        contact_name: property.contactDetails?.name,
-        contact_phone: property.contactDetails?.phone,
-        contact_email: property.contactDetails?.email,
-        updated_at: new Date().toISOString(),
-        status: 'pending',
-      })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
@@ -236,35 +243,40 @@ export const propertyService = {
 
   // Update property as admin
   async updatePropertyAdmin(id: string, property: Partial<Property>) {
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (property.title !== undefined) updateData.title = property.title;
+    if (property.description !== undefined) updateData.description = property.description;
+    if (property.price !== undefined) updateData.price = property.price;
+    if (property.deposit !== undefined) updateData.deposit = property.deposit;
+    if (property.location?.address !== undefined) updateData.address = property.location.address;
+    if (property.location?.city !== undefined) updateData.city = property.location.city;
+    if (property.location?.state !== undefined) updateData.state = property.location.state;
+    if (property.location?.pincode !== undefined) updateData.pincode = property.location.pincode;
+    if (property.location?.coordinates?.lat !== undefined) updateData.latitude = property.location.coordinates.lat;
+    if (property.location?.coordinates?.lng !== undefined) updateData.longitude = property.location.coordinates.lng;
+    if (property.propertyType !== undefined) updateData.property_type = property.propertyType;
+    if (property.bedrooms !== undefined) updateData.bedrooms = property.bedrooms;
+    if (property.bathrooms !== undefined) updateData.bathrooms = property.bathrooms;
+    if (property.area !== undefined) updateData.area = property.area;
+    if (property.furnishing !== undefined) updateData.furnishing = property.furnishing;
+    if (property.amenities !== undefined) updateData.amenities = property.amenities;
+    if (property.images !== undefined) updateData.images = property.images;
+    if (property.availability !== undefined) updateData.availability = property.availability;
+    if (property.availableFrom !== undefined) updateData.available_from = property.availableFrom;
+    if (property.featured !== undefined) updateData.featured = property.featured;
+    if (property.status !== undefined) updateData.status = property.status;
+    if (property.tenantType !== undefined) updateData.tenant_type = property.tenantType;
+    if (property.nearbyPlaces !== undefined) updateData.nearby_places = property.nearbyPlaces;
+    if (property.contactDetails?.name !== undefined) updateData.contact_name = property.contactDetails.name;
+    if (property.contactDetails?.phone !== undefined) updateData.contact_phone = property.contactDetails.phone;
+    if (property.contactDetails?.email !== undefined) updateData.contact_email = property.contactDetails.email;
+
     const { data, error } = await supabase
       .from('properties')
-      .update({
-        title: property.title,
-        description: property.description,
-        price: property.price,
-        deposit: property.deposit,
-        address: property.location?.address,
-        city: property.location?.city,
-        state: property.location?.state,
-        pincode: property.location?.pincode,
-        latitude: property.location?.coordinates?.lat,
-        longitude: property.location?.coordinates?.lng,
-        property_type: property.propertyType,
-        bedrooms: property.bedrooms,
-        bathrooms: property.bathrooms,
-        area: property.area,
-        furnishing: property.furnishing,
-        amenities: property.amenities,
-        images: property.images,
-        availability: property.availability,
-        available_from: property.availableFrom,
-        featured: property.featured,
-        status: property.status,
-        contact_name: property.contactDetails?.name,
-        contact_phone: property.contactDetails?.phone,
-        contact_email: property.contactDetails?.email,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
@@ -273,14 +285,17 @@ export const propertyService = {
     return transformProperty(data);
   },
 
-  // Delete property
+  // Delete property permanently from database
   async deleteProperty(id: string) {
     const { error } = await supabase
       .from('properties')
       .delete()
       .eq('id', id);
 
-    if (error) throw error;
+    if (error) {
+      console.error('Delete error:', error);
+      throw new Error('Failed to delete property from database');
+    }
   },
 
   // Approve property (admin only)
@@ -291,6 +306,7 @@ export const propertyService = {
         status: 'approved',
         approved_by: adminId,
         approved_at: new Date().toISOString(),
+        rejection_reason: null, // Clear rejection reason when approving
       })
       .eq('id', propertyId);
 
