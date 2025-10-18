@@ -14,7 +14,7 @@ L.Icon.Default.mergeOptions({
 });
 
 interface LocationPickerProps {
-  onLocationSelect: (lat: number, lng: number, address: string) => void;
+  onLocationSelect: (location: { lat: number; lng: number }) => void;
   initialLat?: number;
   initialLng?: number;
 }
@@ -34,6 +34,7 @@ export default function LocationPicker({ onLocationSelect, initialLat, initialLn
   );
   const [isClient, setIsClient] = useState(false);
   const [loadingAddress, setLoadingAddress] = useState(false);
+  const [address, setAddress] = useState('');
 
   // Default center: Kochi, Kerala
   const defaultCenter: [number, number] = [9.9312, 76.2673];
@@ -66,8 +67,10 @@ export default function LocationPicker({ onLocationSelect, initialLat, initialLn
 
   const handleMapClick = async (lat: number, lng: number) => {
     setPosition([lat, lng]);
-    const address = await reverseGeocode(lat, lng);
-    onLocationSelect(lat, lng, address);
+    const addr = await reverseGeocode(lat, lng);
+    setAddress(addr);
+    // Call parent with correct format
+    onLocationSelect({ lat, lng });
   };
 
   const handleUseCurrentLocation = () => {
@@ -81,8 +84,10 @@ export default function LocationPicker({ onLocationSelect, initialLat, initialLn
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         setPosition([lat, lng]);
-        const address = await reverseGeocode(lat, lng);
-        onLocationSelect(lat, lng, address);
+        const addr = await reverseGeocode(lat, lng);
+        setAddress(addr);
+        // Call parent with correct format
+        onLocationSelect({ lat, lng });
       },
       (error) => {
         console.error('Error getting location:', error);
@@ -138,14 +143,19 @@ export default function LocationPicker({ onLocationSelect, initialLat, initialLn
       </div>
 
       <p className="text-sm text-gray-600">
-        💡 <strong>Tip:</strong> Click anywhere on the map to pin your property's exact location, or use the button above to use your current GPS location.
+        💡 <strong>Tip:</strong> Click anywhere on the map to pin your property&apos;s exact location, or use the button above to use your current GPS location.
       </p>
 
       {position && (
         <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
           <p className="text-sm text-green-800">
-            ✅ <strong>Location pinned:</strong> {position[0].toFixed(6)}, {position[1].toFixed(6)}
+            ✓ <strong>Location pinned:</strong> {position[0].toFixed(6)}, {position[1].toFixed(6)}
           </p>
+          {address && (
+            <p className="text-xs text-green-700 mt-1">
+              📍 {address}
+            </p>
+          )}
         </div>
       )}
     </div>
