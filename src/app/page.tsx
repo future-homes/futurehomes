@@ -15,7 +15,6 @@ export default function HomePage() {
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [locationLoading, setLocationLoading] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   
   // Filters
@@ -47,34 +46,8 @@ export default function HomePage() {
   };
 
   const handleSearchNearMe = () => {
-    setLocationLoading(true);
-    
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          
-          const params = new URLSearchParams();
-          params.set('lat', latitude.toString());
-          params.set('lng', longitude.toString());
-          params.set('radius', radius.toString());
-          if (propertyType) params.set('propertyType', propertyType);
-          if (bhkType) params.set('bedrooms', bhkType);
-          if (tenantType) params.set('tenant', tenantType);
-          
-          router.push(`/search?${params.toString()}`);
-          setLocationLoading(false);
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-          alert('Please enable location access to search nearby properties');
-          setLocationLoading(false);
-        }
-      );
-    } else {
-      alert('Geolocation is not supported by your browser');
-      setLocationLoading(false);
-    }
+    // Simply redirect to search page with nearMe=true parameter
+    router.push('/search?nearMe=true');
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -108,7 +81,7 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="text-lg md:text-xl text-gray-300">
-              Premium Houses  • Verified Listings • Affordable Prices
+              Premium Houses • Verified Listings • Affordable Prices
             </p>
           </div>
 
@@ -148,25 +121,15 @@ export default function HomePage() {
                   </button>
 
                   <button
-  type="button"
-  onClick={handleSearchNearMe}
-  disabled={locationLoading}
-  className="flex-1 md:flex-initial px-1.5 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-emerald-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
->
-  {locationLoading ? (
-    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-  ) : (
-    <>
-      {/* Icon - Only show on desktop */}
-      <svg className="w-5 h-5 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-      </svg>
-      {/* Text - Always show */}
-      <span>Near Me</span>
-    </>
-  )}
-</button>
-
+                    type="button"
+                    onClick={handleSearchNearMe}
+                    className="flex-1 md:flex-initial px-3 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-emerald-700 transition flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+  <span className="text-sm md:text-base">Near Me</span>
+                  </button>
 
                   <button
                     type="submit"
@@ -361,7 +324,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Keep all other sections the same - Featured, Why Choose Us, Recent Properties, CTA */}
       {/* Featured Properties */}
       {featuredProperties.length > 0 && (
         <section className="py-20 bg-white">
@@ -433,6 +395,18 @@ export default function HomePage() {
               <h3 className="text-lg font-bold text-gray-900 mb-2">Instant Response</h3>
               <p className="text-gray-600 text-sm">
                 Quick replies via WhatsApp
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition">
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Best Prices</h3>
+              <p className="text-gray-600 text-sm">
+                Competitive rates with no hidden fees
               </p>
             </div>
           </div>
