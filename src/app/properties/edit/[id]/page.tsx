@@ -37,7 +37,6 @@ export default function EditPropertyPage() {
   const [locationData, setLocationData] = useState<{
     lat: number;
     lng: number;
-    address: string;
   } | null>(null);
 
   const [formData, setFormData] = useState({
@@ -105,7 +104,6 @@ export default function EditPropertyPage() {
           setLocationData({
             lat: data.location.coordinates.lat,
             lng: data.location.coordinates.lng,
-            address: data.location.address,
           });
         }
       } catch (error) {
@@ -147,15 +145,15 @@ export default function EditPropertyPage() {
     }));
   };
 
+  // Fixed location handler
   const handleLocationSelect = (location: { lat: number; lng: number }) => {
-  setLocationData(location);
-};
+    setLocationData(location);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!user || !property) return;
-
     if (!locationData) {
       alert('Please pin your property location on the map');
       return;
