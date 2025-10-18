@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Future Homes - Find Your Perfect Rental Property in Kerala',
-  description: 'Discover the best rental properties in Kerala. Browse apartments, houses, villas and commercial spaces in Kochi, Trivandrum, Kozhikode and more. No brokerage, direct owner contact.',
+  description: 'Discover the best rental properties in Kerala. Browse apartments, houses, villas and commercial spaces in Kochi, Trivandrum, Kozhikode and more.',
   keywords: ['rental properties kerala', 'apartments for rent kochi', 'houses for rent trivandrum', 'kerala real estate', 'property rental', 'rent house kerala', 'future homes'],
   authors: [{ name: 'Future Homes' }],
   
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   // Open Graph
   openGraph: {
     title: 'Future Homes - Find Your Perfect Rental Property',
-    description: 'Discover the best rental properties in Kerala. No brokerage, direct owner contact.',
+    description: 'Discover the best rental properties in Kerala.',
     url: 'https://futurehomes.com',
     siteName: 'Future Homes',
     images: [

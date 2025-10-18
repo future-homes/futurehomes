@@ -108,7 +108,7 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="text-lg md:text-xl text-gray-300">
-              Zero Brokerage • Verified Listings • Direct Owner Contact
+              Premium Houses  • Verified Listings • Affordable Prices
             </p>
           </div>
 
@@ -151,7 +151,7 @@ export default function HomePage() {
   type="button"
   onClick={handleSearchNearMe}
   disabled={locationLoading}
-  className="flex-1 md:flex-initial px-2.5 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-emerald-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+  className="flex-1 md:flex-initial px-1.5 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-emerald-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
 >
   {locationLoading ? (
     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -170,7 +170,7 @@ export default function HomePage() {
 
                   <button
                     type="submit"
-                    className="flex-1 md:flex-initial px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition"
+                    className="flex-1 md:flex-initial px-3 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition"
                   >
                     Search
                   </button>
@@ -409,18 +409,6 @@ export default function HomePage() {
               <h3 className="text-lg font-bold text-gray-900 mb-2">Verified Listings</h3>
               <p className="text-gray-600 text-sm">
                 Every property verified for authenticity
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Zero Brokerage</h3>
-              <p className="text-gray-600 text-sm">
-                Direct owner contact, no hidden charges
               </p>
             </div>
 

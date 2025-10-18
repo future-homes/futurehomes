@@ -15,8 +15,7 @@ export default function Footer() {
           <div>
             <Logo variant="white" size="md" />
             <p className="mt-4 text-sm text-gray-400 leading-relaxed">
-              Your trusted partner in finding the perfect rental property in Kerala. 
-              Connect directly with property owners, no brokerage fees.
+              Your trusted partner in finding the perfect rental property in Kerala.
             </p>
             <div className="flex gap-3 mt-6">
               <a

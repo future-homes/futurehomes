@@ -12,9 +12,77 @@ const LocationPicker = dynamic(() => import('@/components/LocationPicker'), {
   loading: () => <div className="h-96 bg-gray-100 rounded-lg animate-pulse"></div>
 });
 
+// Image compression function
+async function compressImage(file: File, maxSizeKB: number = 300): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions while maintaining aspect ratio
+        const maxDimension = 1920;
+        if (width > height && width > maxDimension) {
+          height = (height * maxDimension) / width;
+          width = maxDimension;
+        } else if (height > maxDimension) {
+          width = (width * maxDimension) / height;
+          height = maxDimension;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Try different quality levels to get under target size
+        let quality = 0.9;
+        const tryCompress = () => {
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error('Compression failed'));
+                return;
+              }
+
+              const sizeKB = blob.size / 1024;
+              
+              if (sizeKB <= maxSizeKB || quality <= 0.1) {
+                // Create compressed file
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                });
+                console.log(`✅ Compressed: ${file.name} from ${(file.size / 1024).toFixed(0)}KB to ${sizeKB.toFixed(0)}KB`);
+                resolve(compressedFile);
+              } else {
+                // Try again with lower quality
+                quality -= 0.1;
+                tryCompress();
+              }
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+
+        tryCompress();
+      };
+      img.onerror = () => reject(new Error('Failed to load image'));
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+  });
+}
+
 // Image upload function
 async function uploadImage(file: File): Promise<string> {
-  const fileExt = file.name.split('.').pop();
+  const fileExt = 'jpg'; // Always use jpg after compression
   const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
   const filePath = `properties/${fileName}`;
 
@@ -64,6 +132,7 @@ export default function UploadPropertyPage() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [nearbyPlaces, setNearbyPlaces] = useState<any>(null);
   const [fetchingNearby, setFetchingNearby] = useState(false);
+  const [compressing, setCompressing] = useState(false);
 
   const amenitiesList = [
     'Parking', 'Swimming Pool', 'Gym', 'Garden', 'Security', 'Power Backup',
@@ -94,14 +163,32 @@ export default function UploadPropertyPage() {
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       if (images.length + files.length > 10) {
         alert('Maximum 10 images allowed');
         return;
       }
-      setImages(prev => [...prev, ...files]);
+
+      setCompressing(true);
+      try {
+        const compressedFiles: File[] = [];
+        
+        for (const file of files) {
+          // Compress each image
+          const compressed = await compressImage(file, 300);
+          compressedFiles.push(compressed);
+        }
+        
+        setImages(prev => [...prev, ...compressedFiles]);
+        alert(` ${compressedFiles.length} image(s) Uploaded Successfully`);
+      } catch (error) {
+        console.error('Compression error:', error);
+        alert('Error compressing images. Please try again.');
+      } finally {
+        setCompressing(false);
+      }
     }
   };
 
@@ -110,13 +197,6 @@ export default function UploadPropertyPage() {
   };
 
   const handleFetchNearbyPlaces = async () => {
-    console.log('=== FETCH NEARBY DEBUG ===');
-    console.log('1. locationData state:', locationData);
-    console.log('2. locationData type:', typeof locationData);
-    console.log('3. locationData?.lat:', locationData?.lat);
-    console.log('4. locationData?.lng:', locationData?.lng);
-    console.log('========================');
-    
     if (!locationData) {
       alert('Please pin your property location on the map first');
       return;
@@ -124,35 +204,28 @@ export default function UploadPropertyPage() {
 
     if (typeof locationData.lat !== 'number' || typeof locationData.lng !== 'number') {
       alert('Invalid location data. Please click on the map again.');
-      console.error('❌ Invalid locationData:', locationData);
       return;
     }
 
-    // Create a fresh copy of coordinates
     const coords = {
       lat: Number(locationData.lat),
       lng: Number(locationData.lng)
     };
 
-    console.log('📤 Sending coordinates:', coords);
-
     setFetchingNearby(true);
     try {
       const { fetchNearbyPlaces } = await import('@/lib/nearbyPlaces');
-      console.log('📞 Calling fetchNearbyPlaces with:', coords);
-      
       const nearby = await fetchNearbyPlaces(coords);
-      console.log('📥 Received nearby places:', nearby);
 
       if (nearby && Object.values(nearby).some((arr: any) => arr.length > 0)) {
         setNearbyPlaces(nearby);
         const total = Object.values(nearby).reduce((sum: number, arr: any) => sum + arr.length, 0);
-        alert(`✅ Found ${total} nearby places!`);
+        alert(` Found ${total} nearby places!`);
       } else {
         alert('No nearby places found in this area.');
       }
     } catch (error) {
-      console.error('❌ Error:', error);
+      console.error('Error:', error);
       alert('Error fetching nearby places. Please try again.');
     } finally {
       setFetchingNearby(false);
@@ -261,6 +334,70 @@ export default function UploadPropertyPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Images */}
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b">
+                Property Images <span className="text-red-500">*</span>
+              </h2>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition">
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageChange}
+                  disabled={compressing}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label htmlFor="image-upload" className={`cursor-pointer ${compressing ? 'opacity-50' : ''}`}>
+                  {compressing ? (
+                    <div className="flex flex-col items-center">
+                      <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                      <p className="text-lg font-semibold text-blue-600">Compressing images...</p>
+                      <p className="text-sm text-gray-500 mt-2">This may take a moment</p>
+                    </div>
+                  ) : (
+                    <>
+                      <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <p className="text-lg font-semibold text-gray-700 mb-2">Click to upload images</p>
+                      <p className="text-sm text-gray-500">Upload up to 10 images</p>
+                      <p className="text-xs text-blue-600 mt-1"></p>
+                    </>
+                  )}
+                </label>
+              </div>
+
+              {images.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-sm font-semibold text-gray-700 mb-3">
+                    {images.length} image(s) selected • Total: {(images.reduce((sum, img) => sum + img.size, 0) / 1024).toFixed(0)}KB
+                  </p>
+                  <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
+                    {images.map((img, idx) => (
+                      <div key={idx} className="relative group">
+                        <img
+                          src={URL.createObjectURL(img)}
+                          alt={`Preview ${idx + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                        />
+                        <div className="absolute bottom-1 left-1 right-1 bg-black/70 text-white text-xs px-1 py-0.5 rounded text-center">
+                          {(img.size / 1024).toFixed(0)}KB
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeImage(idx)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:bg-red-600"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             {/* Basic Information */}
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b">Basic Information</h2>
@@ -648,55 +785,6 @@ export default function UploadPropertyPage() {
                 ))}
               </div>
             </div>
-
-            {/* Images */}
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b">
-                Property Images <span className="text-red-500">*</span>
-              </h2>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <p className="text-lg font-semibold text-gray-700 mb-2">Click to upload images</p>
-                  <p className="text-sm text-gray-500">Upload up to 10 images (JPG, PNG, WebP)</p>
-                </label>
-              </div>
-
-              {images.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-sm font-semibold text-gray-700 mb-3">{images.length} image(s) selected</p>
-                  <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
-                    {images.map((img, idx) => (
-                      <div key={idx} className="relative group">
-                        <img
-                          src={URL.createObjectURL(img)}
-                          alt={`Preview ${idx + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(idx)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:bg-red-600"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* Contact Details */}
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b">Contact Information</h2>
