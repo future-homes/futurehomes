@@ -61,16 +61,6 @@ export default function Navbar() {
               Properties
             </Link>
             <Link
-              href="/search"
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                isActive('/search') 
-                  ? 'bg-blue-50 text-blue-600' 
-                  : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
-              }`}
-            >
-              Search
-            </Link>
-            <Link
               href="/contact"
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 isActive('/contact') 

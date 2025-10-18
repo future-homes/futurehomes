@@ -62,13 +62,12 @@ export default function PropertyDetailsPage() {
   };
 
   const handleWhatsAppEnquiry = () => {
-  const propertyUrl = window.location.href; // current full property page URL
-  const message = encodeURIComponent(
-    `Hi, I'm interested in: ${property?.title}\n${property?.location.address}, ${property?.location.city}\nPrice: ₹${property?.price.toLocaleString()}/month\n\nCheck this out: ${propertyUrl}`
-  );
-  window.open(`https://wa.me/${websiteWhatsApp.replace(/\D/g, '')}?text=${message}`, '_blank');
-};
-
+    const propertyUrl = window.location.href;
+    const message = encodeURIComponent(
+      `Hi, I'm interested in: ${property?.title}\n${property?.location.address}, ${property?.location.city}\nPrice: ₹${property?.price.toLocaleString()}/month\n\nCheck this out: ${propertyUrl}`
+    );
+    window.open(`https://wa.me/${websiteWhatsApp.replace(/\D/g, '')}?text=${message}`, '_blank');
+  };
 
   const handleShare = () => {
     if (navigator.share) navigator.share({ title: property?.title, url: window.location.href });
@@ -83,38 +82,15 @@ export default function PropertyDetailsPage() {
 
   if (!property) return null;
 
-  // Use consistent stat objects with optional unit property
   const stats = [
     { label: 'Bedrooms', value: property.bedrooms, short: 'Beds', unit: '' },
     { label: 'Bathrooms', value: property.bathrooms, short: 'Baths', unit: '' },
-    { label: 'Area', value: property.area, short: 'Sqft. Area'},
-    { label: 'Deposit', value: `₹${(property.deposit / 1000).toFixed(0)}`, short: 'Deposit' },
+    { label: 'Area', value: property.area, short: 'Sqft. Area', unit: ' sqft' },
+    { label: 'Deposit', value: `₹${(property.deposit / 1000).toFixed(0)}`, short: 'Deposit', unit: 'k' },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 pb-20 lg:pb-0">
-      {/* Mobile-Friendly Header */}
-      <div className="backdrop-blur-xl bg-white/95 border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-medium overflow-x-auto flex-1 min-w-0">
-              <Link href="/" className="text-gray-500 hover:text-blue-600 transition whitespace-nowrap">Home</Link>
-              <span className="text-gray-300">/</span>
-              <Link href="/properties" className="text-gray-500 hover:text-blue-600 transition whitespace-nowrap">Properties</Link>
-              <span className="text-gray-300">/</span>
-              <span className="text-blue-600 font-bold whitespace-nowrap truncate">{property.location.city}</span>
-            </div>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <button onClick={handleShare} className="px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg hover:border-blue-500 transition text-[10px] sm:text-xs font-semibold">
-                Share
-              </button>
-              <FavoriteButton propertyId={property.id} size="sm" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-
       {/* Mobile-Optimized Image Gallery */}
       <div className="bg-gray-900">
         <div className="max-w-7xl mx-auto">
@@ -129,7 +105,7 @@ export default function PropertyDetailsPage() {
                 priority
               />
             </div>
-            
+
             {property.images.length > 1 && (
               <>
                 <button
@@ -150,7 +126,6 @@ export default function PropertyDetailsPage() {
                 </button>
               </>
             )}
-
 
             <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 flex items-end justify-between z-10">
               <div className="flex gap-1.5 sm:gap-2">
@@ -175,7 +150,6 @@ export default function PropertyDetailsPage() {
                 </div>
               </div>
             </div>
-
 
             {/* Thumbnail Navigation - Hidden on Mobile */}
             <div className="absolute bottom-14 left-1/2 -translate-x-1/2 hidden lg:flex gap-2 z-10">
@@ -237,6 +211,7 @@ export default function PropertyDetailsPage() {
             ))}
           </div>
         </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-5">
@@ -274,7 +249,7 @@ export default function PropertyDetailsPage() {
                       {property.description}
                     </p>
                   </div>
-                  
+
                   <div>
                     <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Property Details</h2>
                     <div className="grid grid-cols-2 gap-2 sm:gap-3">
@@ -409,14 +384,14 @@ export default function PropertyDetailsPage() {
             )}
           </div>
 
-          {/* Desktop Sidebar */}
+          {/* Desktop Sidebar with Favorite Button */}
           <div className="hidden lg:block lg:col-span-1">
             <div className="sticky top-24 space-y-4">
               <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Contact Property Owner</h3>
 
                 <div className="space-y-3">
-                  <button 
+                  <button
                     onClick={handleWhatsAppEnquiry}
                     className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition flex items-center justify-center gap-2"
                   >
@@ -425,8 +400,8 @@ export default function PropertyDetailsPage() {
                     </svg>
                     WhatsApp
                   </button>
-                  
-                  <a 
+
+                  <a
                     href={`tel:${property.contactDetails.phone}`}
                     className="block w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition text-center"
                   >
@@ -434,14 +409,17 @@ export default function PropertyDetailsPage() {
                   </a>
 
                   <button
-            onClick={handleShare}
-            className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-xl shadow-md text-center transition"
-          >
-            Share Property
-          </button>
+                    onClick={handleShare}
+                    className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-xl shadow-md text-center transition"
+                  >
+                    Share Property
+                  </button>
+
+                  <div className="pt-2">
+                    <FavoriteButton propertyId={property.id} size="lg" />
+                  </div>
                 </div>
               </div>
-              
 
               <div className="bg-gray-50 rounded-2xl p-4">
                 <div className="text-xs text-gray-600 mb-1">Posted On</div>
