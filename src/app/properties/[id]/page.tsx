@@ -85,7 +85,7 @@ export default function PropertyDetailsPage() {
   const stats = [
     { label: 'Bedrooms', value: property.bedrooms, short: 'Beds', unit: '' },
     { label: 'Bathrooms', value: property.bathrooms, short: 'Baths', unit: '' },
-    { label: 'Area', value: property.area, short: 'Sqft. Area', unit: ' sqft' },
+    { label: 'Area', value: property.area, short: 'Sqft. Area', },
     { label: 'Deposit', value: `₹${(property.deposit / 1000).toFixed(0)}`, short: 'Deposit', unit: 'k' },
   ];
 
