@@ -1,6 +1,15 @@
 'use client'
 
-import { PropertyFilters as FilterType } from '@/types/property';
+interface FilterType {
+  location?: string;
+  propertyType?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  furnishing?: string;
+  amenities?: string[];
+}
 
 interface PropertyFiltersProps {
   filters: FilterType;
