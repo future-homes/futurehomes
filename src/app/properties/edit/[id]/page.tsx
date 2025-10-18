@@ -147,9 +147,9 @@ export default function EditPropertyPage() {
     }));
   };
 
-  const handleLocationSelect = (lat: number, lng: number, address: string) => {
-    setLocationData({ lat, lng, address });
-  };
+  const handleLocationSelect = (location: { lat: number; lng: number }) => {
+  setLocationData(location);
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
