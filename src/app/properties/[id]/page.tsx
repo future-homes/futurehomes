@@ -62,9 +62,13 @@ export default function PropertyDetailsPage() {
   };
 
   const handleWhatsAppEnquiry = () => {
-    const message = encodeURIComponent(`Hi, I'm interested in: ${property?.title}\n${property?.location.address}, ${property?.location.city}\n₹${property?.price.toLocaleString()}/month`);
-    window.open(`https://wa.me/${websiteWhatsApp.replace(/\D/g, '')}?text=${message}`, '_blank');
-  };
+  const propertyUrl = window.location.href; // current full property page URL
+  const message = encodeURIComponent(
+    `Hi, I'm interested in: ${property?.title}\n${property?.location.address}, ${property?.location.city}\nPrice: ₹${property?.price.toLocaleString()}/month\n\nCheck this out: ${propertyUrl}`
+  );
+  window.open(`https://wa.me/${websiteWhatsApp.replace(/\D/g, '')}?text=${message}`, '_blank');
+};
+
 
   const handleShare = () => {
     if (navigator.share) navigator.share({ title: property?.title, url: window.location.href });
@@ -410,12 +414,6 @@ export default function PropertyDetailsPage() {
             <div className="sticky top-24 space-y-4">
               <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Contact Property Owner</h3>
-                
-                <div className="mb-5 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
-                  <div className="text-xs text-gray-600 mb-1">Owner</div>
-                  <div className="text-base font-bold text-gray-900">{property.contactDetails.name}</div>
-                  <div className="text-xs text-gray-500 mt-1">{property.contactDetails.phone}</div>
-                </div>
 
                 <div className="space-y-3">
                   <button 
@@ -435,14 +433,15 @@ export default function PropertyDetailsPage() {
                     Call Now
                   </a>
 
-                  <a 
-                    href={`mailto:${property.contactDetails.email}`}
-                    className="block w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-xl transition text-center"
-                  >
-                    Send Email
-                  </a>
+                  <button
+            onClick={handleShare}
+            className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-xl shadow-md text-center transition"
+          >
+            Share Property
+          </button>
                 </div>
               </div>
+              
 
               <div className="bg-gray-50 rounded-2xl p-4">
                 <div className="text-xs text-gray-600 mb-1">Posted On</div>
