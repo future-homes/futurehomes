@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { usePathname } from 'next/navigation'
+import Logo from '@/components/Logo'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -12,7 +13,6 @@ export default function Navbar() {
   const { user, isAdmin, signOut, loading } = useAuth()
   const pathname = usePathname()
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10)
@@ -35,18 +35,8 @@ export default function Navbar() {
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-2xl shadow-lg group-hover:shadow-xl transition-all">
-              🏠
-            </div>
-            <div>
-              <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Future Homes
-              </div>
-              <div className="text-xs text-gray-500">Find Your Dream Home</div>
-            </div>
-          </Link>
+          {/* Logo Component */}
+          <Logo variant="default" size="md" />
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
@@ -98,7 +88,6 @@ export default function Navbar() {
               <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             ) : user ? (
               <>
-                {/* List Property Button */}
                 <Link
                   href="/properties/upload"
                   className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
@@ -109,7 +98,6 @@ export default function Navbar() {
                   List Property
                 </Link>
 
-                {/* User Menu */}
                 <div className="relative">
                   <button
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -131,13 +119,9 @@ export default function Navbar() {
                     </svg>
                   </button>
 
-                  {/* Dropdown Menu */}
                   {showProfileMenu && (
                     <>
-                      <div 
-                        className="fixed inset-0 z-10" 
-                        onClick={() => setShowProfileMenu(false)}
-                      ></div>
+                      <div className="fixed inset-0 z-10" onClick={() => setShowProfileMenu(false)}></div>
                       <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-20 animate-fade-in">
                         <div className="px-4 py-3 border-b border-gray-100">
                           <p className="text-sm font-semibold text-gray-900">
@@ -301,13 +285,12 @@ export default function Navbar() {
                       }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      🛡️ Admin Panel
+                      Admin Panel
                     </Link>
                   )}
                 </>
               )}
 
-              {/* Mobile Auth Section */}
               <div className="pt-4 mt-4 border-t border-gray-200">
                 {loading ? (
                   <div className="flex justify-center py-4">
@@ -325,9 +308,7 @@ export default function Navbar() {
                             {user.user_metadata?.full_name || 'User'}
                           </p>
                           <p className="text-xs text-gray-600">{user.email}</p>
-                          {isAdmin && (
-                            <p className="text-xs text-orange-600 font-bold">ADMIN</p>
-                          )}
+                          {isAdmin && <p className="text-xs text-orange-600 font-bold">ADMIN</p>}
                         </div>
                       </div>
                     </div>
