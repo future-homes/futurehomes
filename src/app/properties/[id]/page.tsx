@@ -259,7 +259,6 @@ export default function PropertyDetailsPage() {
                         { label: 'Available From', value: new Date(property.availableFrom).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) },
                         { label: 'Preferred For', value: property.tenantType?.join(', ') || 'Anyone' },
                         { label: 'Parking', value: 'Available' },
-                        { label: 'Facing', value: 'East' },
                       ].map((detail, idx) => (
                         <div key={idx} className="p-2 sm:p-3 bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg sm:rounded-xl border border-gray-200">
                           <div className="text-[9px] sm:text-[10px] font-semibold text-gray-600 mb-0.5 sm:mb-1">{detail.label}</div>
